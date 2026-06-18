@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Play, Star, Clock, BookOpen, ArrowRight } from 'lucide-react';
 import { courseService } from '../../services/courseService';
+import GuestCheckoutModal from '../../components/GuestCheckoutModal';
 
 const HomePage = () => {
   const [courses, setCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState(null);
 
   useEffect(() => {
     courseService.getAllCourses().then(res => setCourses(Array.isArray(res.data) ? res.data : [])).catch(err => console.error(err));
@@ -28,34 +30,39 @@ const HomePage = () => {
               Unlock Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-400">Potential</span>
             </h1>
             <p className="text-lg text-slate-300 mb-8 max-w-2xl mx-auto lg:mx-0">
-              Master new skills with high-quality courses taught by industry experts. Flexible learning that fits your schedule.
+              Master the skills of the future with our premium courses. Learn from industry experts and take your career to the next level.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Link to="/courses" className="bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 group">
-                Browse Courses <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              <Link to="/courses" className="px-8 py-4 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-all hover:scale-105 shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
+                Explore Courses <ArrowRight className="h-5 w-5" />
+              </Link>
+              <Link to="/dashboard" className="px-8 py-4 rounded-xl font-bold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all flex items-center justify-center gap-2">
+                <Play className="h-5 w-5" /> Watch Demo
               </Link>
             </div>
           </div>
-          <div className="flex-1 w-full max-w-lg lg:max-w-none relative">
-            <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative group">
-              <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop" alt="Students learning" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center group-hover:bg-slate-900/30 transition-colors">
-                <button className="bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full p-4 transition-all">
-                  <Play className="h-10 w-10 text-white fill-white" />
-                </button>
-              </div>
-            </div>
+          <div className="flex-1 w-full max-w-lg lg:max-w-none relative hidden md:block">
+             {/* Abstract Code/Learning Illustration */}
+             <div className="aspect-square rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 blur-3xl absolute inset-0"></div>
+             <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1000&auto=format&fit=crop" alt="Students learning" className="relative rounded-2xl shadow-2xl border border-white/10 object-cover aspect-video w-full" />
+             <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-6 shadow-xl border border-slate-100 flex items-center gap-4">
+               <div className="bg-indigo-100 p-3 rounded-full text-indigo-600"><BookOpen className="h-6 w-6" /></div>
+               <div>
+                 <div className="text-2xl font-black text-slate-900">200+</div>
+                 <div className="text-sm font-medium text-slate-500">Premium Courses</div>
+               </div>
+             </div>
           </div>
         </div>
       </section>
 
       {/* Featured Courses */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-slate-50 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-end mb-12">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Featured Courses</h2>
-              <p className="text-slate-600 text-lg">Top-rated courses picked just for you.</p>
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Trending Now</h2>
+              <p className="text-slate-500 text-lg">Top-rated courses handpicked for you.</p>
             </div>
             <Link to="/courses" className="text-indigo-600 font-semibold hover:text-indigo-700 hidden sm:flex items-center gap-1 group">
               View all <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -64,7 +71,7 @@ const HomePage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {courses.slice(0, 3).map(course => (
-              <Link to={`/courses/${course.slug}`} key={course.id} className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <div onClick={() => setSelectedCourse(course)} key={course.id} className="cursor-pointer group flex flex-col bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                 <div className="aspect-[16/9] overflow-hidden relative">
                   <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-slate-800 uppercase tracking-wider">
@@ -89,11 +96,11 @@ const HomePage = () => {
                   <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
                     <span className="text-2xl font-black text-slate-900">${course.price}</span>
                     <span className="text-indigo-600 font-semibold flex items-center gap-1">
-                      Enroll <ArrowRight className="h-4 w-4" />
+                      Buy Now <ArrowRight className="h-4 w-4" />
                     </span>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
           {courses.length === 0 && (
@@ -101,6 +108,13 @@ const HomePage = () => {
           )}
         </div>
       </section>
+
+      {selectedCourse && (
+        <GuestCheckoutModal 
+          course={selectedCourse} 
+          onClose={() => setSelectedCourse(null)} 
+        />
+      )}
     </div>
   );
 };

@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Star, Clock } from 'lucide-react';
 import { courseService } from '../../services/courseService';
+import GuestCheckoutModal from '../../components/GuestCheckoutModal';
 
 const CoursesPage = () => {
   const [courses, setCourses] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [selectedCourse, setSelectedCourse] = useState(null);
 
   useEffect(() => {
     courseService.getAllCourses()
@@ -39,7 +41,7 @@ const CoursesPage = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filtered.map(course => (
-          <Link to={`/courses/${course.slug}`} key={course.id} className="group flex flex-col bg-white rounded-xl overflow-hidden border border-slate-200 hover:border-indigo-200 shadow-sm hover:shadow-lg transition-all duration-300">
+          <div onClick={() => setSelectedCourse(course)} key={course.id} className="cursor-pointer group flex flex-col bg-white rounded-xl overflow-hidden border border-slate-200 hover:border-indigo-200 shadow-sm hover:shadow-lg transition-all duration-300">
             <div className="aspect-video overflow-hidden relative">
               <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
             </div>
@@ -50,9 +52,10 @@ const CoursesPage = () => {
               
               <div className="flex items-center gap-3 mt-auto pt-4 border-t border-slate-100 text-xs text-slate-600 font-medium">
                 <span className="text-lg font-bold text-slate-900">${course.price}</span>
+                <span className="ml-auto text-indigo-600 font-semibold">Buy Now</span>
               </div>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
       
@@ -62,6 +65,13 @@ const CoursesPage = () => {
            <h3 className="text-lg font-medium text-slate-900">No courses found</h3>
            <p className="text-slate-500">Try adjusting your search terms.</p>
          </div>
+      )}
+
+      {selectedCourse && (
+        <GuestCheckoutModal 
+          course={selectedCourse} 
+          onClose={() => setSelectedCourse(null)} 
+        />
       )}
     </div>
   );
